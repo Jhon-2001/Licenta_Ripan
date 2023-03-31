@@ -132,7 +132,7 @@ grow"
 										}
 										aria-current="page"
 									>
-										Planificare Retele
+										Ghid Utilizare Aplicatie
 										<img
 											className="ml-2 -mb-4 pb-4 h-10 w-8"
 											src="\icons\network.svg"

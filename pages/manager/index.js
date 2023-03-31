@@ -16,6 +16,7 @@ export default function Manager() {
 	};
 
 	const [isHovering, setIsHovering] = useState(false);
+	const [isHoveringBand, setIsHoveringBand] = useState(false);
 	const handleMouseOver = () => {
 		setIsHovering(true);
 	};
@@ -28,10 +29,16 @@ export default function Manager() {
 		banda: "",
 	};
 
+	const handleMouseOverBand = () => {
+		setIsHoveringBand(true);
+	};
+	const handleMouseOutBand = () => {
+		setIsHoveringBand(false);
+	};
 	// const [items, setItems] = useState([]);
 	const [fdata, setFdata] = useState(initialState);
-	const { frecventa, banda,  } = fdata;
-	
+	const { frecventa, banda } = fdata;
+
 	const readExcel = (file) => {
 		const promise = new Promise((resolve, reject) => {
 			const fileReader = new FileReader();
@@ -69,7 +76,9 @@ export default function Manager() {
 		promise.then((d) => {
 			let arr = farr;
 
-			d.map((e) => arr.push({ frecventa: e[Object.keys(e)[0]].toFixed(3), band: e[Object.keys(e)[1]] }));
+			d.map((e) =>
+				arr.push({ frecventa: e[Object.keys(e)[0]].toFixed(3), band: e[Object.keys(e)[1]] })
+			);
 
 			var help = farr.filter(
 				(value, index, self) => index === self.findIndex((t) => t.frecventa === value.frecventa)
@@ -212,8 +221,27 @@ export default function Manager() {
 									htmlFor="password"
 									className="block  mb-2 px-1 font-bold pt-1 text-md text-gray-900 "
 								>
+									<span
+										onMouseOver={handleMouseOverBand}
+										onMouseOut={handleMouseOutBand}
+										className="bg-gray-400 px-1.5 -ml-2  text-red-700 border-2 border-red-600  font-bold rounded-full"
+									>
+										?
+									</span>{" "}
 									Banda ( kHz )
 								</label>
+								{isHoveringBand && (
+									<div className="absolute border-2 w-full md:w-1/2 left-[30%]  border-gray-800 rounded-md bg-gray-300">
+										<h1 className="text-gray-800 font-bold">
+											Banda în jurul purtătoarei unui semnal se referă la intervalul de frecvențe în
+											care energia semnalului este concentrată în jurul frecvenței purtătoarei.
+											
+										</h1>
+										<h1>De Regula pentru HF banda este 3 kHz</h1>
+										<h1>De Regula pentru VHF banda este 25 kHz</h1>
+										<h1>De Regula pentru SHF banda este pana la ordinul MHz </h1>
+									</div>
+								)}
 								<input
 									type="number"
 									value={banda}
@@ -455,7 +483,7 @@ export default function Manager() {
 										</th>
 										<th className=" border-2  border-gray-700 ">
 											<svg
-											 className="mx-auto"
+												className="mx-auto"
 												width="20"
 												height="25"
 												viewBox="0 0 24 24"
@@ -506,17 +534,17 @@ export default function Manager() {
 														<td className="text-blue-700 ">
 															<button
 																className="hover:scale-110"
-																onClick={() =>
-																{	setFdata({
-																	frecventa: x.frecventa,
-																	banda: x.band,
-																})
+																onClick={() => {
+																	setFdata({
+																		frecventa: x.frecventa,
+																		banda: x.band,
+																	});
 																	setFarr(
 																		farr.filter(function (farr) {
 																			return farr.frecventa != x.frecventa;
 																		})
-																	)}
-																}
+																	);
+																}}
 															>
 																{" "}
 																Editeaza
