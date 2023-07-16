@@ -85,11 +85,11 @@ export default function SubmenuManager() {
           (path == '/manager/armonici'
             ? "bg-green-700 "
             : "bg-gray-700 ") +
-            " inline-flex text-center rounded-md hover:scale-105 md:w-28 w-2/5 items-center py-1  pl-1.5 md:py-2 md:px-4 text-sm font-normal text-gray-900 border mr-2  border-white dark:text-white "
+            " inline-flex text-center rounded-md whitespace-nowrap hover:scale-105 md:w-40 w-2/5 items-center py-1  pl-1.5 md:py-2 pr-1 text-sm font-normal text-gray-900 border mr-2  border-white dark:text-white "
           }	>
          <svg
           aria-hidden="true"
-          className="mr-2 md:w-4 hidden md:block h-4 fill-current"
+          className="mr-2 md:w-4  hidden md:block h-4 fill-current"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -100,7 +100,7 @@ export default function SubmenuManager() {
             clipRule="evenodd"
           ></path>
         </svg>
-      Armonici
+      Canale Interferență
       </Link>
     </div>
   </div>

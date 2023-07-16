@@ -20,18 +20,7 @@ const SubmenuTrafic = () => {
 				
 					Erlang<span class="ml-2 text-red-600 font-bold"> B</span>
 				</Link>
-				<Link
-					href="/trafic/erlangc"
-					type="button"
-					className={
-						(path == "/trafic/erlangc" ? "bg-green-700 " : "bg-gray-700 ") +
-						" inline-flex text-center rounded-md hover:scale-105 md:w-48 mb-1 items-center py-1 w-28 pl-2.5 md:py-2 md:px-4 text-md font-normal text-gray-900 border mr-2  border-white dark:text-white "
-					}
-				>
-					{" "}
 				
-					Erlang<span class="ml-2 text-red-600 font-bold"> C</span>
-				</Link>{" "}
 				<Link
 					href="/trafic/engset"
 					type="button"

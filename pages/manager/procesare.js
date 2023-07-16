@@ -6,9 +6,10 @@ import React, { useState, useContext, useEffect } from "react";
 import { DataContext } from "../../store/GlobalState";
 
 export default function Manager() {
-	const [selectedValue, setSelectedValue] = useState(0);
+	const [selectedValue, setSelectedValue] = useState("2");
+	const [selectedValueBaza, setSelectedValueBaza] = useState("5");
 
-	const [boolarmonici, setBoolarmonici] = useState(false);
+	const [boolarmonici, setBoolarmonici] = useState(false); // verificare armonici
 	const [boolintermodulatii, setBoolintermodulatii] = useState(false);
 
 	const [frecventeprocesate, setFreqProcesate] = useState([]); // frecvente procesate
@@ -29,9 +30,12 @@ export default function Manager() {
 
 	const handleChange = (e) => {
 		setSelectedValue(e.target.value);
-		// console.log(selectedValue)
+		// console.log(selectedValue);
 	};
-
+	const handleChangeBaza = (e) => {
+		setSelectedValueBaza(e.target.value);
+		// console.log(selectedValueBaza);
+	};
 	const handleMouseOver = () => {
 		setBoolarmonici(true);
 	};
@@ -45,7 +49,7 @@ export default function Manager() {
 		setBoolintermodulatii(false);
 	};
 	//---------------------------------------------------------------------------------------------
-	const initialState = { armonica: 3, nrfreq: 5, val: 3, nrfreqinterm: 2, chadiacent: 5 };
+	const initialState = { armonica: 3, nrfreq: 5, val: "1+2", nrfreqinterm: 2, chadiacent: 5 };
 	const [procesaredata, setProcesaredata] = useState(initialState);
 	const { armonica, nrfreq, nrfreqinterm } = procesaredata;
 
@@ -61,7 +65,7 @@ export default function Manager() {
 	const handleChangeInput = (e) => {
 		const { name, value } = e.target;
 		setProcesaredata({ ...procesaredata, [name]: value });
-		// console.log(procesaredata)
+		// console.log(procesaredata);
 	};
 
 	// ------------------------------------------------------------------------------------------ Preluare date intrare
@@ -74,7 +78,7 @@ export default function Manager() {
 			dispatch({
 				type: "NOTIFY",
 				payload: {
-					error: "Armoinca este mai mare deca  si mai mica decat 7", // mesaj de avertizare
+					error: "Armoinca este mai mare decat 1 si mai mica decat 7", // mesaj de avertizare
 				},
 			});
 			setProcesaredata(initialState);
@@ -96,8 +100,6 @@ export default function Manager() {
 			defaultarr.push({
 				frecventa: +farr[u].frecventa,
 				band: +farr[u].band,
-				distanta: +farr[u].distanta,
-				putere: +farr[u].putere,
 				fi: Number(farr[u].frecventa) - Number(farr[u].band / 1000 / 2),
 				fs: Number(farr[u].frecventa) + Number(farr[u].band / 1000 / 2),
 				relativeband: Number(farr[u].band / 10000 / 2),
@@ -118,11 +120,7 @@ export default function Manager() {
 			// ---------------------------------------------------------------------------------------------------Verificare frecvente compatibile
 			var incanal = false; // definire variabila de tip  bool - false
 			for (var n = 0; n < armonici.length; n++) {
-				// console.log(armonici[n].fi - +defaultarr[i].relativeband);
-
-				// for loop care verifica daca canalele de frecvente interfereaza
 				if (
-					// console.log(+defaultarr[i].fs, "<", armonici[n].fs," si ",defaultarr[i].fi, ">", armonici[n].fi)
 
 					+defaultarr[i].frecventa < armonici[n].fs + +defaultarr[i].relativeband &&
 					+defaultarr[i].frecventa > armonici[n].fi - +defaultarr[i].relativeband &&
@@ -148,26 +146,25 @@ export default function Manager() {
 					// ===========================================================================================================
 					const powerset = (arr) =>
 						arr.reduce((a, v) => a.concat(a.map((r) => [v].concat(r))), [[]]);
-
 					var canaleintermodulatii = powerset(temparr).filter((x) => x.length > 1);
-
 					canaleintermodulatii = [...new Set(canaleintermodulatii)];
+					canaleintermodulatii = canaleintermodulatii.filter((x) => x.length <= +nrfreqinterm);
 
-					canaleintermodulatii = canaleintermodulatii.filter((x) => 
-						x.length <= +nrfreqinterm
-					);
-
-					console.log(canaleintermodulatii);
+					// console.log(canaleintermodulatii);
 
 					function generateCombinations(array, index, currentResult, results) {
 						if (index === array.length) {
 							results.push(currentResult);
 							return;
 						}
-						generateCombinations(array, index + 1, +currentResult + +array[index], results);
+						if (+procesaredata.val == 1 || procesaredata.val == "1+2")
+							generateCombinations(array, index + 1, +currentResult + +array[index], results);
 						generateCombinations(array, index + 1, +currentResult - +array[index], results);
-						generateCombinations(array, index + 1, +currentResult + +array[index] * 2, results);
-						generateCombinations(array, index + 1, +currentResult - +array[index] * 2, results);
+
+						if (+procesaredata.val == 2 || procesaredata.val == "1+2") {
+							generateCombinations(array, index + 1, +currentResult + +array[index] * 2, results);
+							generateCombinations(array, index + 1, +currentResult - +array[index] * 2, results);
+						}
 					}
 
 					function generateCombinationsChar(array, index, currentResult, results) {
@@ -234,14 +231,18 @@ export default function Manager() {
 
 				for (let k = 1; k - 1 <= procesaredata.armonica; k++) {
 					if (k == 1) {
-						var fi = Number(defaultarr[i].frecventa * k) - Number(defaultarr[i].band / 200);
-						var fs = Number(defaultarr[i].frecventa * k) + Number(defaultarr[i].band / 200);
+						var fi =
+							Number(defaultarr[i].frecventa * k) -
+							Number((selectedValueBaza * defaultarr[i].band) / 1000);
+						var fs =
+							Number(defaultarr[i].frecventa * k) +
+							Number((selectedValueBaza * defaultarr[i].band) / 1000);
 						armonici.push({
 							fi: fi,
 							fs: fs,
 							freq: +defaultarr[i].frecventa,
 							type: `Canal de Baza : ${defaultarr[i].frecventa}`,
-							band: defaultarr[i].band * 5,
+							band: defaultarr[i].band * selectedValueBaza,
 						});
 					}
 					if (k > 1) {
@@ -400,14 +401,12 @@ export default function Manager() {
 										</div>
 									)}
 									<input
-										min="0"
-										max="7"
+										
 										step="1"
 										type="number"
 										onChange={handleChangeInput}
 										value={armonica}
 										name="armonica"
-										id="email"
 										className="ml-1 border w-full  border-blue-900 text-slate-200 text-sm rounded-lg bg-gray-700  block p-2.5 "
 										default="3"
 										required
@@ -434,17 +433,10 @@ export default function Manager() {
 							</div>
 							<div className="mb-2 w-full pb-5 -mt-4 ">
 								<label htmlFor="email" className="block mb-1 font-bold text-md text-gray-900 ">
-									<span
-										// onMouseOver={handleMouseOver}
-										// onMouseOut={handleMouseOut}
-										data-tooltip-target="tooltip-default"
-										className="bg-gray-400 px-1.5 hover:scale-110  py-0 text-md text-red-700 border-2 border-red-600  font-bold rounded-full"
-									>
-										?
-									</span>{" "}
-									Numar frecvente luate in combinare ( 2-{nrfreq} )
+									Numarul de frecvente luate in calculul intermodulatiilor | 2 - Lungime set({" "}
+									{nrfreq} )
 								</label>
-								{boolarmonici && (
+								{/* {boolarmonici && (
 									<div className=" p-1 pt-0 absolute bg-gray-400 border-2  font-medium border-gray-700 mr-16 z-100 rounded-md">
 										{" "}
 										Armonica unei frecvente este egală cu un multiplu întreg al frecvenţei
@@ -454,7 +446,7 @@ export default function Manager() {
 										<span className="font-bold">40MHz(I) - 60MHz(II) - 80(III) - 100MHz(IV)</span>
 										<img alt="armonici" src="\images\armonici.png"></img>
 									</div>
-								)}
+								)} */}
 								<input
 									min="2"
 									max={nrfreq}
@@ -465,7 +457,6 @@ export default function Manager() {
 									name="nrfreqinterm"
 									id="nrfreqinterm"
 									className="ml-1 border w-full  border-blue-900 text-slate-200 text-sm rounded-lg bg-gray-700  block p-2.5 "
-									default="3"
 									required
 								></input>{" "}
 							</div>
@@ -485,7 +476,7 @@ export default function Manager() {
 											>
 												?
 											</span>
-											<span class=" "> Numar de armonici pentru calcul interarmonici.</span>
+											<span class=" "> Ordin produse intermodulatie</span>
 											{boolintermodulatii && (
 												<div className="p-1 absolute pt-0 bg-gray-400 border-2  font-medium border-gray-700 mr-16 z-100 rounded-md">
 													{" "}
@@ -511,41 +502,117 @@ export default function Manager() {
 										value="1"
 										name="val"
 										onChange={handleChangeInput}
+										checked={procesaredata.val == "1"}
 										id="val1"
 										className="w-4 h-4 ml-6"
 									></input>{" "}
-									<label className="text-md grow font-bold ml-1">0</label>
+									<label className="text-md grow font-bold ml-1">
+										<span className="text-red-600 font-bold text-md">I:</span> F1 ± F2{" "}
+									</label>
 									<input
 										type="radio"
 										value="2"
 										name="val"
 										onChange={handleChangeInput}
 										id="val2"
-										className="w-4 h-4 ml-6"
+										className="w-4 h-4 ml-2"
+										checked={procesaredata.val == "2"}
 									></input>{" "}
-									<label className="text-md grow font-bold ml-1">1</label>
+									<label className="text-md grow font-bold ml-1">
+										<span className="text-red-600 font-bold text-md">II :</span> 2F1 ± F2 sau 2F2 ±
+										F1{" "}
+									</label>
 									<input
 										type="radio"
-										value="3"
+										value="1+2"
 										name="val"
 										onChange={handleChangeInput}
+										checked={procesaredata.val == "1+2"}
 										id="val3"
-										className="w-4 h-4 ml-6"
+										className="w-4 h-4 ml-2"
 									></input>{" "}
-									<label className="text-md font-bold ml-1">2</label>
+									<label className="text-md font-bold ml-1">
+										<span className="text-red-600 font-bold text-md">I + II</span>
+									</label>
+								</div>
+								<div className="md:flex -mt-3">
+									<div className="mb-2 font-bold w-full ">
+										<label
+											htmlFor="email"
+											className="ml-6 block mb-1 font-bold text-md text-gray-900 "
+										>
+											Numar canale adiacente pentru frecventa de baza
+										</label>
+										<input
+											className="w-4 h-4 ml-6"
+											type="radio"
+											id="option21"
+											name="chadiacentBaza"
+											value="1"
+											onChange={handleChangeBaza}
+											checked={selectedValueBaza === "1"}
+										/>
+										<label for="option1">1</label>
+
+										<input
+											className="w-4 h-4 ml-6"
+											type="radio"
+											id="option22"
+											name="chadiacentBaza"
+											value="2"
+											onChange={handleChangeBaza}
+											checked={selectedValueBaza === "2"}
+										/>
+										<label for="option2">2</label>
+
+										<input
+											className="w-4 h-4 ml-6"
+											type="radio"
+											id="option23"
+											name="chadiacentBaza"
+											value="3"
+											onChange={handleChangeBaza}
+											checked={selectedValueBaza === "3"}
+										/>
+										<label for="option3">3</label>
+
+										<input
+											className="w-4 h-4 ml-6"
+											type="radio"
+											id="option24"
+											name="chadiacentBaza"
+											value="4"
+											onChange={handleChangeBaza}
+											checked={selectedValueBaza === "4"}
+										/>
+										<label for="option4">4</label>
+
+										<input
+											className="w-4 h-4 ml-6"
+											type="radio"
+											id="option25"
+											name="chadiacentBaza"
+											checked={selectedValueBaza === "5"}
+											value="5"
+											onChange={handleChangeBaza}
+										/>
+										<label for="option5">5</label>
+										<input
+											className="w-4 h-4 ml-6"
+											type="radio"
+											id="option25"
+											name="chadiacentBaza"
+											checked={selectedValueBaza === "10"}
+											value="10"
+											onChange={handleChangeBaza}
+										/>
+										<label for="option5">10</label>
+									</div>
 								</div>
 								<div className="md:flex -mt-3">
 									<div className="mb-2 font-bold w-full ">
 										<label htmlFor="email" className="block mb-1 font-bold text-md text-gray-900 ">
-											<span
-												// onMouseOver={handleMouseOver}
-												// onMouseOut={handleMouseOut}
-												data-tooltip-target="tooltip-default"
-												className="bg-gray-400 px-1.5 hover:scale-110  py-0 text-md text-red-700 border-2 border-red-600  font-bold rounded-full"
-											>
-												?
-											</span>{" "}
-											Numar canale adiacente interarmonici
+											<span className="pl-6"></span> Numar canale adiacente pentru intermodulatii
 										</label>
 										<input
 											className="w-4 h-4 ml-6"
@@ -554,10 +621,12 @@ export default function Manager() {
 											name="chadiacent"
 											value="1"
 											onChange={handleChange}
+											checked={selectedValue === "1"}
 										/>
 										<label for="option1">1</label>
 
 										<input
+											checked={selectedValue === "2"}
 											className="w-4 h-4 ml-6"
 											type="radio"
 											id="option22"
@@ -568,6 +637,7 @@ export default function Manager() {
 										<label for="option2">2</label>
 
 										<input
+											checked={selectedValue === "3"}
 											className="w-4 h-4 ml-6"
 											type="radio"
 											id="option23"
@@ -578,6 +648,7 @@ export default function Manager() {
 										<label for="option3">3</label>
 
 										<input
+											checked={selectedValue === "4"}
 											className="w-4 h-4 ml-6"
 											type="radio"
 											id="option24"
@@ -588,6 +659,7 @@ export default function Manager() {
 										<label for="option4">4</label>
 
 										<input
+											checked={selectedValue === "5"}
 											className="w-4 h-4 ml-6"
 											type="radio"
 											id="option25"
@@ -598,6 +670,7 @@ export default function Manager() {
 										<label for="option5">5</label>
 									</div>
 								</div>
+
 								<button
 									type="submit"
 									// onClick={ handleSubmit}

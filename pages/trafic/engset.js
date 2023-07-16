@@ -74,12 +74,6 @@ const ErlangB = () => {
 
 	function engset_circuite(traffic, block, sources) {
 		if (traffic && block && sources) {
-			/*
-		:param traffic: the traffic in Erlangs
-		:param block: blocking rate
-		:param sources: the number of points generating the traffic
-		:return: number of servers
-		*/
 			var lines = 1;
 			let p_search = basic_engset(lines, traffic, block, sources);
 			while (p_search >= block) {

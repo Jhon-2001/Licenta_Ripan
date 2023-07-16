@@ -9,7 +9,6 @@ export default function Layout({ children }) {
 		<div>
 			<Notify />
 			<NavBar />
-			{/* <Notify /> */}
 			{children}
 	    <Footer />
 		</div>

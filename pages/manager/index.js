@@ -47,6 +47,7 @@ export default function Manager() {
 			fileReader.onload = (e) => {
 				const bufferArray = e.target.result;
 				const wb = XLSX.read(bufferArray, { type: "buffer" });
+				console.log("wb",wb)
 
 				const wsname = wb.SheetNames[0];
 
@@ -85,7 +86,7 @@ export default function Manager() {
 			);
 			let distinct = [];
 			let duplicates = [];
-			farr.forEach((item, index, object) => {
+			farr.forEach((item) => {
 				if (distinct.find((current) => current.frecventa === item.frecventa)) {
 					duplicates.push(item);
 				} else {
@@ -98,7 +99,7 @@ export default function Manager() {
 						type: "NOTIFY",
 						payload: {
 							error: `${
-								"Duplicate gasite si sterse la frecventale:" +
+								"Atenție, frecvențe duplicate. Pentru buna funcționare au fost eliminate." +
 								duplicates.map((e) => e.frecventa + "MHz ")
 							}`,
 						},
@@ -157,11 +158,11 @@ export default function Manager() {
 		dispatch({
 			type: "NOTIFY",
 			payload: {
-				success: " Frecventa " + frecventa + " de MHz  ---> " + "Banda de " + banda + " Khz",
+				success: " Frecventa de " + frecventa + " MHz cu " + "Banda de " + banda + " Khz a fost introdusă în set",
 			},
 		});
 
-		setFarr([...farr, { frecventa, band: banda, putere, distanta }]);
+		setFarr([...farr, { frecventa, band: banda }]);
 	};
 	useEffect(() => {
 		dispatch({
@@ -171,6 +172,8 @@ export default function Manager() {
 			},
 		});
 	}, [dispatch, farr]);
+
+	
 	const DeleteFarr = (e) => {
 		e.preventDefault();
 		const response = prompt(
